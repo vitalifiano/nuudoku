@@ -599,46 +599,39 @@ function setGame() {
     solution = puzzles[randomIndex].solution;
 
     // Digits 1-9
-    var digitsContainer = document.getElementById("digits");
     for (let i = 1; i <= 9; i++) {
         let number = document.createElement("div");
+        number.id = i;
         number.innerText = i;
-        number.classList.add("number");
         number.addEventListener("click", selectNumber);
-        digitsContainer.appendChild(number);
+        number.classList.add("number");
+        document.getElementById("digits").appendChild(number);
     }
 
     // Board 9x9
-    var boardContainer = document.getElementById("board");
-    var boardHTML = "";
     for (let r = 0; r < 9; r++) {
         for (let c = 0; c < 9; c++) {
-            let tileHTML = `<div id="${r}-${c}" class="tile`;
+            let tile = document.createElement("div");
+            tile.id = r.toString() + "-" + c.toString();
             if (board[r][c] !== "-") {
-                tileHTML += " tile-start";
-                tileHTML += `" >${board[r][c]}</div>`;
-            } else {
-                tileHTML += `" ></div>`;
+                tile.innerText = board[r][c];
+                tile.classList.add("tile-start");
             }
             if (r == 2 || r == 5) {
-                tileHTML += `<div class="horizontal-line"></div>`;
+                tile.classList.add("horizontal-line");
             }
             if (c == 2 || c == 5) {
-                tileHTML += `<div class="vertical-line"></div>`;
+                tile.classList.add("vertical-line");
             }
-            boardHTML += tileHTML;
+            tile.addEventListener("click", selectTile);
+            tile.classList.add("tile");
+            document.getElementById("board").append(tile);
         }
     }
-    boardContainer.innerHTML = boardHTML;
-    boardContainer.addEventListener("click", function(event) {
-        var target = event.target;
-        if (target.classList.contains("tile")) {
-            selectTile(target);
-        }
-    });
 }
 
-function selectNumber() {
+
+function selectNumber(){
     if (numSelected != null) {
         numSelected.classList.remove("number-selected");
     }
@@ -646,17 +639,21 @@ function selectNumber() {
     numSelected.classList.add("number-selected");
 }
 
-function selectTile(tile) {
+function selectTile() {
     if (numSelected) {
-        if (tile.innerText != "") {
+        if (this.innerText != "") {
             return;
         }
-        var coords = tile.id.split("-");
-        var r = parseInt(coords[0]);
-        var c = parseInt(coords[1]);
-        if (solution[r][c] == numSelected.innerText) {
-            tile.innerText = numSelected.innerText;
-        } else {
+
+        // "0-0" "0-1" .. "3-1"
+        let coords = this.id.split("-"); //["0", "0"]
+        let r = parseInt(coords[0]);
+        let c = parseInt(coords[1]);
+
+        if (solution[r][c] == numSelected.id) {
+            this.innerText = numSelected.id;
+        }
+        else {
             errors += 1;
             document.getElementById("errors").innerText = errors;
         }
